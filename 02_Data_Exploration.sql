@@ -54,7 +54,7 @@ WHERE
     TIMESTAMP_DIFF(ended_at, started_at, MINUTE) <= 1 OR -- less than a minute
     TIMESTAMP_DIFF(ended_at, started_at, MINUTE) >= 1440; -- more than a day
 -- less than a minute = 263293 records
--- more than a minute =   6418 records 
+-- more than a day    =   6418 records 
 -- total              = 269711 records
 -- Also checks for cases where the end time is before the start time.
 -- Timestamp format: YYYY-MM-DD hh:mm:ss UTC.
