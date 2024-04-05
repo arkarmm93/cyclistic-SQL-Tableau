@@ -31,7 +31,7 @@ FROM cyclistic_bike_share.trip_2023_combined;
 
 -- Investigate data quality column by column
 
--- 1) rider_id: No Duplicates & Ensure consistent length of rider IDs 
+-- rider_id: No Duplicates & Ensure consistent length of rider IDs 
 -- checking for duplicate rows
 SELECT COUNT(ride_id) - COUNT(DISTINCT ride_id) AS duplicate_rows
 FROM cyclistic_bike_share.trip_2023_combined;
@@ -42,12 +42,12 @@ FROM cyclistic_bike_share.trip_2023_combined
 GROUP BY rider_id_length;
 -- All ride_ids consist of 16 characters.
 
--- 2) rideable_type: Identify bike types
+-- rideable_type: Identify bike types
 SELECT DISTINCT rideable_type
 FROM cyclistic_bike_share.trip_2023_combined
 -- Three bike types observed: classic, electric, and docked.
 
--- 3) started_at, ended_at: Analyze ride duration. Identify rides that are extremely short or unusually long
+-- started_at, ended_at: Analyze ride duration. Identify rides that are extremely short or unusually long
 SELECT ride_id, started_at, ended_at
 FROM cyclistic_bike_share.trip_2023_combined
 WHERE 
@@ -59,25 +59,28 @@ WHERE
 -- Also checks for cases where the end time is before the start time.
 -- Timestamp format: YYYY-MM-DD hh:mm:ss UTC.
 
--- 4) Name & ID of start_station and end_station
-SELECT DISTINCT start_station_name, COUNT(*) AS count_start_station
-FROM cyclistic_bike_share.trip_2023_combined
-GROUP BY start_station_name;
--- Total distinct start_station_names observed, including null values.
+-- Name & ID of start_station and end_station
+-- start_station_name, start_station_id - total 875848 rows with both start station name and id missing
 
-SELECT DISTINCT end_station_name, COUNT(*) AS count_end_station
+SELECT DISTINCT start_station_name
 FROM cyclistic_bike_share.trip_2023_combined
-GROUP BY end_station_name;
--- Total distinct end_station_names observed, including null values.
+ORDER BY start_station_name;
 
-SELECT DISTINCT start_station_id, end_station_id
+SELECT COUNT(ride_id) AS rows_with_start_station_null          -- return 875848 rows
 FROM cyclistic_bike_share.trip_2023_combined
-WHERE start_station_id IS NOT NULL OR end_station_id IS NOT NULL;
--- Null values observed in station IDs. 
--- 172490 records
--- Inconsistent string lengths in station IDs ignored as they're not critical.
+WHERE start_station_name IS NULL OR start_station_id IS NULL;
 
--- 5) Latitude & Longitude of start and end
+-- end_station_name, end_station_id - total 929343 rows with both end station name and id missing
+
+SELECT DISTINCT end_station_name
+FROM cyclistic_bike_share.trip_2023_combined
+ORDER BY end_station_name;
+
+SELECT COUNT(ride_id) AS rows_with_null_end_station          -- return 929343 rows
+FROM cyclistic_bike_share.trip_2023_combined
+WHERE end_station_name IS NULL OR end_station_id IS NULL;
+
+-- Latitude & Longitude of start and end
 SELECT * 
 FROM cyclistic_bike_share.trip_2023_combined
 WHERE
@@ -86,11 +89,11 @@ WHERE
     end_lat IS NULL OR
     end_lng IS NULL OR
     end_lat = 0 OR
-    end_lng = 0 NULL;
+    end_lng = 0 ;
 -- Total null values observed in latitude and longitude.
 -- 6993 records (Null - 6990, zero - 3) records
 
--- 6) member_casual: Membership types
+-- member_casual: Membership types
 SELECT member_casual, COUNT(*) AS count_membership
 FROM cyclistic_bike_share.trip_2023_combined
 GROUP BY member_casual;
